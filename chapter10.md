@@ -55,11 +55,7 @@ public interface ITableBiz {
 
 	public abstract void unOccupyTable(Table table) throws Exception;
 
-	public abstract void canPayBill(Table table) throws Exception;
-
 	public abstract void reconfigureTables(int newNoOfTables) throws Exception;
-
-	public abstract void canTableTakeOrders(Table table) throws Exception;
 
 }
 ```
@@ -224,3 +220,99 @@ if (noOfGuests <= 0) {
 ```
 
 При использовании исправленного кода тестовый случай 5 проходится успешно.
+
+## Верификация функциональности компонента - тестирование черного ящика
+Набор тестов, проведенных в последнем разделе,  средоточием на тестировании реализации компонента с полным знанием о спецификации реализации и действительной реализации. Такой тип тестирования возможен когда компонент тестируется его же разработчиком. Однако, компонент потребляется в контексте системы, и пользователи компонента знают лишь об интерфейсе компонента и его функциональной спецификации. У них нет доступа к реализации компонента или к спецификации реализации. Важно, что компонент тестируется до того как развертывается и собирается в контексте системы. Для таких целей, тестирование черного ящика на уровне компонентов необходимо чтобы убедиться, что компонент выполняет функции в соответствии с их функциональной спецификацией.
+
+Тестовые случаи черного ящика опираются на функциональную спецификацию интерфейса, предоставленного компонентом. На основании функциональных спецификаций, тестовые случаи разрабатываются для покрытия
+тестирование всех методов в интерфейсе. Множество тестовых случаев может понадобиться для одного метода, чтобы исчерпывающе протестировать его поведение на всем спектре входных значений. Ниже мы рассмотрим тестовые случаи и метод тестирования компонента TableBiz. Интерфейс, предоставленный компонентом TableBiz, приведен ниже для справки:
+
+```java
+public interface ITableBiz {
+
+	public abstract int getNoOfTables();
+
+	public abstract List<Table> getOccupiedTables();
+
+	public abstract List<Table> getEmptyTables();
+
+	public abstract void occupyTable(Table table, int noOfGuests, String waiter)
+			throws Exception;
+
+	public abstract void unOccupyTable(Table table) throws Exception;
+
+	public abstract void reconfigureTables(int newNoOfTables) throws Exception;
+}
+```
+
+Функциональные спецификации методов приведены в таблице 10.3
+
+На основании функциональных спецификаций, тестовые случаи разработаны для проверки всех методов интерфейса. В следующих разделах мы рассмотрим несколько тестовых случаев и процедур их выполнения. Эти тестовые случаи являются лишь набором для примера и не достаточны, чтобы охватить все сценарии, которые должны быть протестированы.
+
+### Тестовый случай для количества столиков
+
+В этом тестовом случае мы хотим проверить методы, через которые задается количество столиков в компоненте TableBiz. Для этого есть 2 метода и мы тестируем оба с помощью следующих действий:
+1. Вызвать reconfigureTables() с 20-ю столиками
+2. Вызвать getNoOfTables()
+
+В конце этой последовательности мы ожидаем получить число 20 в качестве возвращаемого значения метода getNoOfTables(). Чтобы провести этот тест мы используем компонент тестового драйвера, аналогичный используваемым в последних двух разделах. Метод activate() тестового драйвера вызывает методы реализации тестового случая. Код реализации данного тестового случая представлен ниже:
+
+```java
+private void testCase1() {
+    
+  System.out.println("\n— — — — — — — — — — -");
+  System.out.println("Executing Test Case 1");
+  
+  try {
+    System.out.println("Calling reconfigureTables(20)");
+    tableBiz.reconfigureTables(20);
+    System.out.println("Calling getNoOfTables() and it returned " + tableBiz.getNoOfTables());
+  } catch (Exception e) {
+    System.out.println("ERROR - " + e.getMessage());
+  } finally {  
+    System.out.println("— — — — — — — — — — -\n");
+  }
+}
+```
+
+Как видно из кода, тестовый драйвер сначала вызывает метод компонента reconfigureTables(). Это сопровождается вызовом getNoOfTables(). Если собрать и запустить компоненты тестового драйвера и TableBiz, то мы можем убедиться что возвращаемое значение соответствует ожидаемому числу 20.
+
+### Тестовый случай для функциональности заказа столика.
+
+В этом тестовом случае мы хотим проверить операции по заказу столиков. Мы тестируем это с помощью следующих действий:
+1. Вызвать occupyTable() для 5ого столика
+2. Вызвать occupyTable() для 10ого столика
+3. Вызвать getOccupiedTables()
+
+После выполнения тестового случая мы ожидаем, что getOccupiedTables() вернет список из 2ух столиков: столик 5 и столик 10. Чтобы выполнить этот тестовый случай, мы пишем еще один метод в компоненте тестового драйвера, код для которого представлен ниже:
+
+```java
+private void testCase2() {
+  System.out.println("Executing Test Case 2");
+  try {    
+    List<Table> tables = tableBiz.getEmptyTables();  
+    Table table5 = null;    
+    Table table10 = null;  
+    for (Table table : tables) {    
+      if (table.getTableNo() = = 5)    
+      table5 = table;  
+      if (table.getTableNo() = = 10)    
+      table10 = table;
+    }
+    System.out.println("Calling occupy table for table 5");
+    tableBiz.occupyTable(table5, 4, "waiter");
+    System.out.println("Calling occupy table for table 10");
+    tableBiz.occupyTable(table10, 4, "waiter");
+    System.out.println("Calling getOccupiedTables() and it returned following tables ");    
+    tables = tableBiz.getOccupiedTables();
+    for (Table table : tables) {
+      System.out.println("Table " + table.
+      getTableNo());
+    }        
+  } catch (Exception e) {
+    System.out.println("ERROR - " + e.getMessage());    
+  } finally {    
+    System.out.println("— — — — — — — — — — -\n");
+  }
+}
+```
