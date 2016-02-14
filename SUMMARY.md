@@ -1,6 +1,6 @@
 # Summary
 * [Chapter 1](chapter10/README.md)
-* * [Chapter 1](chapter10/README.md)
+* * [Chapter 1.1](chapter10/README.md)
 * [Chapter 2]()
 * [Chapter 3]()
 * [Chapter 4]()
