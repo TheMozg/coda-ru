@@ -87,24 +87,20 @@ public interface ITableBiz {
 Теперь рассмотрим методику тестирования черного ящика, с помощью которой мы можем установить, что компонент действительно обеспечивает интерфейс в соответствии со спецификацией. В тестировании черного ящика мы принимаем данный компонент как черный ящик, то есть мы не обладаем никаким знанием о его реализации и внутреннем устройстве. Мы развёртываем компонент в среде OSGi и проверяем предоставленный интерфейс. Чтобы протестировать что развернутый компонент предоставляет указанный интерфейс, мы используем тестовый драйвер, который будет потреблять данный интерфейс. Если тестовый драйвер успешно использовал предоставленный интерфейс, валидация считается успешной. Если же тестовый драйвер не смог успешно использовать интерфейс, то валидация терпит неудачу.
 
 Для валидации компонента TableBiz нам нужен компонент тестового драйвера, который будет потреблять интерфейс ITableBiz. Мы создаем новый OSGi модуль POS.Test.Table.Biz, в котором есть есть декларативный сервис-компонент, связанный с сервисом ITableBiz. Код для компонента предоставлен ниже:
-```java
+```
 public class TestTableBiz {
 	
     private ITableBiz tableBiz;
 	
     public void setTableBiz(ITableBiz tableBiz) {
-	
-this.tableBiz = tableBiz;
+	    this.tableBiz = tableBiz;
 	}
 	
-	
-	
-public void activate() {
-if (tableBiz ! = null)
-System.out.println("SUCCESS - Got
-ITableBiz service");
-	else
-	System.out.println("FAIL - Could not get ITableBiz service");
+	public void activate() {
+        if (tableBiz ! = null)
+            System.out.println("SUCCESS - Got ITableBiz service");
+	    else
+	        System.out.println("FAIL - Could not get ITableBiz service");
 	}
 }
 
